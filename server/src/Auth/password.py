@@ -1,19 +1,3 @@
-from prisma import Prisma
-from pydantic import BaseModel
-from fastapi import APIRouter
-# import password as ps
-
-class UserModel(BaseModel):
-    password: str
-    email: str
-
-class TokenModel(BaseModel):
-    token: str
-    user_email: str
-    user: UserModel
-    createdAt: str
-    updatedAt: str
-
 import hashlib
 import os
 
@@ -36,29 +20,14 @@ def verify_password(stored_password_hash: str, salt: bytes, provided_password: s
     
     # Compare the hash of the provided password with the stored hash
     return pwdhash.hex() == stored_password_hash
-router = APIRouter()
 
+# # Example usage
+# password = "my_super_secret_password"
+# hashed_password, salt = hash_password(password)
 
-@router.post("/auth/signup")
-async def signup(user: UserModel):
-    db = Prisma()
-    import pdb; pdb.set_trace()
-    await db.connect()    
-    user_json = user.model_dump()
-    # modify the password to be hashed
-    # ps.hash_password(user_json)
-    hashed_password, salt = hash_password(user_json['password'])
-    user_json['password'] = hashed_password
-    print("user_json", user_json, salt)
-    user_db = await db.user.create(data=user_json)
-    await db.disconnect()
-    return user_db
+# print(f"Hashed Password: {hashed_password}")
+# print(f"Salt: {salt.hex()}")
 
-
-@router.post("/auth/login")
-async def login(user: UserModel):
-    return user
-
-@router.post("/auth/logout")
-async def logout(token: TokenModel):
-    return token
+# # Verifying the password
+# is_correct = verify_password(hashed_password, salt, "my_super_secret_password")
+# print(f"Password correct: {is_correct}")

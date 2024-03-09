@@ -8,7 +8,7 @@ datasource db {
 generator client {
   provider             = "prisma-client-py"
   recursive_type_depth = 5
-  // interface = "sync"
+  interface = "sync"
 }
 
 // data models
@@ -24,6 +24,7 @@ model Post {
 model User {
   email String  @unique @id
   password String
+  salt String
   tokens Token[]
 }
 
