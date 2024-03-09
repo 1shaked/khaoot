@@ -2,9 +2,11 @@ from typing import Union
 
 from fastapi import FastAPI
 from prisma import Prisma
-
+from src.Auth import auth
 app = FastAPI()
 
+
+app.include_router(auth.router, prefix="/auth")
 
 @app.get("/")
 def post_list():
