@@ -45,7 +45,7 @@ router = APIRouter()
 async def signup(user: UserModel):
     db = Prisma()
     import pdb; pdb.set_trace()
-    await db.connect()    
+    db.connect()    
     user_json = user.model_dump()
     # modify the password to be hashed
     # ps.hash_password(user_json)
@@ -54,9 +54,12 @@ async def signup(user: UserModel):
     user_json['password'] = hashed_password
     user_json['salt'] = salt
     print("user_json", user_json, salt)
-    user_db = await db.user.create(data=user_json)
-    await db.disconnect()
-    return user_db
+    user_db = db.user.create(data=user_json)
+    #  generate a token for the user
+    user_db = user_db.model_dump()
+    token = db.token.create(data={"user_email": user_db['email']})
+    db.disconnect()
+    return token
 
 
 @router.post("/auth/login")
@@ -65,26 +68,33 @@ async def login(user: UserModel):
     
     # find the user in the db
     db = Prisma()
-    await db.connect()
-    db_user = await db.user.find_unique(where={"email": user.email})
-    await db.disconnect()
+    db.connect()
+    db_user = db.user.find_unique(where={"email": user.email})
+    db.disconnect()
     db_user = db_user.model_dump()
-    print("db_user", db_user)
     # compare the password with the hashed password
-    db_user['salt']
     is_login = verify_password(db_user['password'], bytes.fromhex(db_user['salt']), user.password)
-    print(is_login)
     # if login create a new token
     if (is_login): 
-        await db.connect()
-        # db_user = await db.token.find_unique(where={"email": user.email})
+        db.connect()
+        db_user = db.token.find_unique(where={"email": user.email})
+        if db_user:
+            # delete the old token
+            db.token.delete(data={"user_email": user.email})
+        token = db.token.create(data={"user_email": user.email})        
         # db.token.update_or_create(data={"token": "123", "user_email": user.email})
-        await db.disconnect()
-    return user
+        db.disconnect()
+        return token
+    return HTTPException(status_code=401, detail="Invalid credentials")
 
 @router.post("/auth/logout")
 async def logout(token: TokenModel):
-    return token
+
+    db = Prisma()
+    db.connect()
+    db_token = db.token.delete(where={"token": token.token, "user_email": token.user_email})
+    db.disconnect()
+    return { 'status': 'success', 'message': 'logged out successfully' }
 
 
 async def token_auth(request: Request):
@@ -100,6 +110,7 @@ async def token_auth(request: Request):
     db = Prisma()
     await db.connect()
     db_token = await db.token.find_unique(where={"token": token})
+    
     await db.disconnect()
     if not db_token:
         raise HTTPException(status_code=401, detail="Token is invalid")

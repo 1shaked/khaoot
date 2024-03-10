@@ -25,7 +25,10 @@ model User {
   email String  @unique @id
   password String
   salt String
-  tokens Token[]
+  tokens Token?
+  questinnerie Questinnerie[] 
+  guests     GustInTornoment[]
+
 }
 
 model Token {
@@ -35,4 +38,54 @@ model Token {
   updatedAt DateTime @updatedAt
   user      User    @relation(fields: [user_email], references: [email])
   user_email String @unique
+}
+
+model Questinnerie {
+  user      User    @relation(fields: [user_email], references: [email])
+  user_email String @unique
+  id        Int     @id @default(autoincrement())
+  title    String
+
+  questions Question[]
+  tornoments Tornoment[]
+
+}
+
+
+model Question {
+  id        Int     @id @default(autoincrement())
+  questinnerie Questinnerie @relation(fields: [questinnerie_id], references: [id])
+  questinnerie_id Int
+  title     String
+  points    Int @default(50)
+  question_time Int @default(10)
+  answers Answer[]
+
+}
+
+model Answer {
+  id        Int     @id @default(autoincrement())
+  question Question @relation(fields: [question_id], references: [id])
+  question_id Int
+  title     String
+  is_correct Boolean @default(false)
+}
+
+
+model Tornoment {
+  id        Int     @id @default(autoincrement())
+  questinnerie Questinnerie @relation(fields: [questinnerie_id], references: [id])
+  questinnerie_id Int
+
+  tournamentsAsGuest GustInTornoment[]
+}
+
+model GustInTornoment {
+  tornoment_id Int  
+  tornoment Tornoment @relation(fields: [tornoment_id], references: [id])
+  user_email String
+  user User @relation(fields: [user_email], references: [email])
+  init_time DateTime @default(now())
+  start_time DateTime?
+  @@id([tornoment_id, user_email])
 }
