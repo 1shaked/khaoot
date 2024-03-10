@@ -26,7 +26,7 @@ model User {
   password String
   salt String
   tokens Token?
-  questinnerie Questinnerie[] 
+  Questionnaire Questionnaire[] 
   guests     GustInTornoment[]
 
 }
@@ -40,7 +40,7 @@ model Token {
   user_email String @unique
 }
 
-model Questinnerie {
+model Questionnaire {
   user      User    @relation(fields: [user_email], references: [email])
   user_email String @unique
   id        Int     @id @default(autoincrement())
@@ -54,8 +54,8 @@ model Questinnerie {
 
 model Question {
   id        Int     @id @default(autoincrement())
-  questinnerie Questinnerie @relation(fields: [questinnerie_id], references: [id])
-  questinnerie_id Int
+  Questionnaire Questionnaire @relation(fields: [Questionnaire_id], references: [id])
+  Questionnaire_id Int
   title     String
   points    Int @default(50)
   question_time Int @default(10)
@@ -74,8 +74,8 @@ model Answer {
 
 model Tornoment {
   id        Int     @id @default(autoincrement())
-  questinnerie Questinnerie @relation(fields: [questinnerie_id], references: [id])
-  questinnerie_id Int
+  Questionnaire Questionnaire @relation(fields: [Questionnaire_id], references: [id])
+  Questionnaire_id Int
 
   tournamentsAsGuest GustInTornoment[]
 }
