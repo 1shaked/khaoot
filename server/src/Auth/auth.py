@@ -2,6 +2,8 @@ from prisma import Prisma
 from pydantic import BaseModel
 from fastapi import APIRouter
 from fastapi import FastAPI, Request, HTTPException, Depends
+import hashlib
+import os
 
 # import password as ps
 
@@ -16,8 +18,6 @@ class TokenModel(BaseModel):
     createdAt: str
     updatedAt: str
 
-import hashlib
-import os
 
 def hash_password(password: str) -> (str, bytes): # type: ignore
     """Hash a password with a salt."""
