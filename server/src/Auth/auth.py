@@ -47,7 +47,6 @@ router = APIRouter()
 async def signup(user: UserModel):
     try:
         db = Prisma()
-        # import pdb; pdb.set_trace()
         db.connect()    
         user_json = user.model_dump()
         # modify the password to be hashed
@@ -75,6 +74,8 @@ async def login(user: UserModel):
     # find the user in the db
     db = Prisma()
     db.connect()
+    import pdb; pdb.set_trace()
+
     db_user = db.user.find_unique(where={"email": user.email})
     db.disconnect()
     db_user = db_user.model_dump()
@@ -83,13 +84,15 @@ async def login(user: UserModel):
     # if login create a new token
     if (is_login): 
         db.connect()
-        db_user = db.token.find_unique(where={"email": user.email})
+        db_user = db.token.find_unique(where={"user_email": user.email})
         if db_user:
             # delete the old token
-            db.token.delete(data={"user_email": user.email})
+            db.token.delete(where={"user_email": user.email})
         token = db.token.create(data={"user_email": user.email})        
         # db.token.update_or_create(data={"token": "123", "user_email": user.email})
         db.disconnect()
+        token = token.model_dump()
+        token['email'] = token['user_email']
         return token
     return HTTPException(status_code=401, detail="Invalid credentials")
 

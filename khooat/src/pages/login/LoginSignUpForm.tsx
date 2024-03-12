@@ -22,7 +22,7 @@ export function LoginSignInPage() {
 
     const login_sign_up_mutation = useMutation({
         mutationFn: async (data: LoginSignInPageSchemaType) => {
-            const action = isLogin ? 'logon' : 'signup';
+            const action = isLogin ? 'login' : 'signup';
             const respond = await customFetch(`auth/${action}`, {
                 method: 'POST',
                 body: JSON.stringify(data)
@@ -56,7 +56,7 @@ export function LoginSignInPage() {
             password: ''
         }
     });
-    const [isLogin, setIsLogin] = useState(false)
+    const [isLogin, setIsLogin] = useState(true)
     return <>
         <form onSubmit={login_sign_form.handleSubmit((data) => {
             console.log(data)
