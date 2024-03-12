@@ -5,6 +5,8 @@ from fastapi import FastAPI, Request, HTTPException, Depends
 import hashlib
 import os
 
+
+
 # import password as ps
 
 class UserModel(BaseModel):
@@ -41,28 +43,32 @@ def verify_password(stored_password_hash: str, salt: bytes, provided_password: s
 router = APIRouter()
 
 
-@router.post("/auth/signup")
+@router.post("/signup")
 async def signup(user: UserModel):
-    db = Prisma()
-    import pdb; pdb.set_trace()
-    db.connect()    
-    user_json = user.model_dump()
-    # modify the password to be hashed
-    # ps.hash_password(user_json)
-    hashed_password, salt = hash_password(user_json['password'])
-    import pdb; pdb.set_trace()
-    user_json['password'] = hashed_password
-    user_json['salt'] = salt
-    print("user_json", user_json, salt)
-    user_db = db.user.create(data=user_json)
-    #  generate a token for the user
-    user_db = user_db.model_dump()
-    token = db.token.create(data={"user_email": user_db['email']})
-    db.disconnect()
-    return token
+    try:
+        db = Prisma()
+        # import pdb; pdb.set_trace()
+        db.connect()    
+        user_json = user.model_dump()
+        # modify the password to be hashed
+        # ps.hash_password(user_json)
+        hashed_password, salt = hash_password(user_json['password'])
+        # import pdb; pdb.set_trace()
+        user_json['password'] = hashed_password
+        user_json['salt'] = salt
+        print("user_json", user_json, salt)
+        user_db = db.user.create(data=user_json)
+        #  generate a token for the user
+        user_db = user_db.model_dump()
+        token = db.token.create(data={"user_email": user_db['email']})
+        db.disconnect()
+        return token
+    except Exception as e:
+        print("error", e)
+        return HTTPException(status_code=400, detail="Invalid credentials")
 
 
-@router.post("/auth/login")
+@router.post("/login")
 async def login(user: UserModel):
     # take the user email and password
     
@@ -87,7 +93,7 @@ async def login(user: UserModel):
         return token
     return HTTPException(status_code=401, detail="Invalid credentials")
 
-@router.post("/auth/logout")
+@router.post("/logout")
 async def logout(token: TokenModel):
 
     db = Prisma()

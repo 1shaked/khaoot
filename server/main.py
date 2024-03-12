@@ -3,10 +3,26 @@ from typing import Union
 from fastapi import FastAPI
 from prisma import Prisma
 from src.Auth import auth
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI()
 
 
+origins = [
+    "*",
+    "http://localhost:5173"
+
+]
+
+
 app.include_router(auth.router, prefix="/auth")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def post_list():
