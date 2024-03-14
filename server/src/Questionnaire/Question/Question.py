@@ -23,3 +23,11 @@ class QuestionDeleteModel(QuestionCreateModel):
 
 class QuestionsCreateListModal(BaseModel):
     questions: list[QuestionCreateModel]
+
+
+class AnswerCreateModel(BaseModel):
+    answer: str
+    is_correct: bool
+
+class QuestionCreateAnswersModel(BaseModel):
+    answers: list[AnswerCreateModel]

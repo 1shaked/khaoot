@@ -247,9 +247,16 @@ export function AddAnswersToQuestion(props: AddAnswersToQuestionProps) {
     const create_answers_mutation = useMutation({
         mutationKey: ['create_question_mutation'],
         mutationFn: async (data: AddAnswersToQuestionForm) => {
-            const response = await customFetch(`question/${props.question_id}/answers/create`, {
+            const response = await customFetch(`question/answers/${props.question_id}/create/`, {
                 method: 'POST',
-                body: JSON.stringify(data)
+                body: JSON.stringify({
+                    answers: data.answers.map(ans => {
+                        return {
+                            answer: ans.title,
+                            is_correct: ans.is_correct
+                        }
+                    })
+                })
             })
             return response
 
@@ -260,6 +267,12 @@ export function AddAnswersToQuestion(props: AddAnswersToQuestionProps) {
                 title: 'Question created successfully',
             })
             setOpen(false)
+        },
+        onError: () => {
+            toast({
+                title: 'Error creating question',
+                variant: 'destructive'
+            })
         }
     })
     const [open, setOpen] = useState(false)
