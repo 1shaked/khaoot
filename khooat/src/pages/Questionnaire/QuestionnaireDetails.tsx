@@ -237,8 +237,42 @@ interface AddAnswersToQuestionForm {
         is_correct: boolean;
     }[];
 }
+
+/**{
+        "id": 1,
+        "question": null,
+        "question_id": 9,
+        "title": "empty answer",
+        "is_correct": false
+    }, */
+export const AnswerResSererItemZod = z.object({
+    title: z.string(),
+    is_correct: z.boolean()
+})
+
+export const QuestionAnswersZod = z.array(AnswerResSererItemZod)
+
 export function AddAnswersToQuestion(props: AddAnswersToQuestionProps) {
     const add_answers_form = useForm<AddAnswersToQuestionForm>()
+    const answers_base_value_mutation = useMutation({
+        mutationKey: ['question_answers', props.question_id],
+        mutationFn: async () => {
+            const response = await customFetch(`question/answers/${props.question_id}/list`, {
+                method: 'GET'
+            })
+            return response
+        },
+        onSuccess: (data) => {
+            const respond_zod = QuestionAnswersZod.safeParse(data)
+            if (respond_zod.success) {
+                add_answers_form.setValue('answers', respond_zod.data)
+            }
+            else  add_answers_form.setValue('answers', data)
+            toast({
+                title: 'Answers loaded successfully',
+            })
+        }        
+    })
     const answers_array_form = useFieldArray({
         control: add_answers_form.control,
         name: 'answers',
@@ -279,7 +313,10 @@ export function AddAnswersToQuestion(props: AddAnswersToQuestionProps) {
     return <form>
         <button type="button"
         className=""
-        onClick={() => setOpen(true)}>
+        onClick={() => {
+            answers_base_value_mutation.mutate()
+            setOpen(true)
+        }}>
             Add Answers
         </button>
         <Dialog open={open} >
