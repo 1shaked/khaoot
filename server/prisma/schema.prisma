@@ -76,7 +76,7 @@ model Tornoment {
   id        Int     @id @default(autoincrement())
   Questionnaire Questionnaire @relation(fields: [Questionnaire_id], references: [id])
   Questionnaire_id Int
-
+  start_time DateTime @default(now())
   tournamentsAsGuest GustInTornoment[]
 }
 

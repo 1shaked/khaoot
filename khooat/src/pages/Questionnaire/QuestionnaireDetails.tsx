@@ -2,7 +2,7 @@ import { toast } from "@/components/ui/use-toast"
 import { customFetch } from "@/utils/HttpClient"
 import { useQuery } from "@tanstack/react-query"
 // import { useEffect } from "react"
-import { useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 
 import {z} from 'zod'
 
@@ -29,9 +29,15 @@ export const QuestionSchemaItemZod = z.object({
 
 })
 
+export const TornomentsItemSchemaZod = z.object({
+    id: z.number(),
+    time: z.string().optional(),
+})
+
 export const QuestionnaireDetailsSchemaZod = z.object({
     title: z.string(),
-    questions: z.array(QuestionSchemaItemZod)
+    questions: z.array(QuestionSchemaItemZod),
+    tornoments: z.array(TornomentsItemSchemaZod),
 })
 export function QuestionnaireDetails() {
     // get the current questionnaire id from the url
@@ -61,11 +67,31 @@ export function QuestionnaireDetails() {
             {get_details_query.data?.title}
         </div>
 
-        {get_details_query.data?.questions.map(question => <div key={question.id}>
-            {question.title}
-        </div>)}
-        <pre>
+        <div>
+            <h2 className="">
+                Questions
+            </h2>
+            {get_details_query.data?.questions.map(question => <div 
+            className="block border-2 border-gray-300 p-2 m-2 rounded-md hover:bg-gray-200 hover:border-gray-400"
+            key={question.id}>
+                {question.title}
+            </div>)}
+        </div>
+        
+        <div className="">
+            <h2>
+                Tornoments
+            </h2>
+            {get_details_query.data?.tornoments.map(question => <Link 
+            className="block border-2 border-gray-300 p-2 m-2 rounded-md hover:bg-gray-200 hover:border-gray-400"
+            to={`/questionnaire/${id}/tornoment/${question.id}`}
+            key={question.id}>
+                {question.time}  {question.id} 
+            </Link>)}
+        </div>
+
+        {/* <pre>
             {JSON.stringify(get_details_query.data, null , 2)}
-        </pre>
+        </pre> */}
     </main>
 }
