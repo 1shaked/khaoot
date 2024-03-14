@@ -42,7 +42,7 @@ model Token {
 
 model Questionnaire {
   user      User    @relation(fields: [user_email], references: [email])
-  user_email String @unique
+  user_email String 
   id        Int     @id @default(autoincrement())
   title    String
 

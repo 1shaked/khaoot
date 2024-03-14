@@ -5,6 +5,7 @@ import { customFetch } from '@/utils/HttpClient';
 import { useToast } from '@/components/ui/use-toast';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const LoginSignInPageSchemaZod = z.object({
     email: z.string().email(),
@@ -19,7 +20,7 @@ export const LoginSignInReturnZod = z.object({
 export type LoginSignInPageSchemaType = z.infer<typeof LoginSignInPageSchemaZod>
 export function LoginSignInPage() {
     const { toast } = useToast()
-
+    const navigate = useNavigate()
     const login_sign_up_mutation = useMutation({
         mutationFn: async (data: LoginSignInPageSchemaType) => {
             const action = isLogin ? 'login' : 'signup';
@@ -41,6 +42,7 @@ export function LoginSignInPage() {
                     description: 'You have successfully created an account',
                     // variant: "success",
                 })
+                navigate('/')
                 return ;
             }
             toast({

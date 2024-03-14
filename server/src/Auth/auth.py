@@ -5,6 +5,9 @@ from fastapi import FastAPI, Request, HTTPException, Depends
 import hashlib
 import os
 
+from datetime import datetime, timedelta, timezone
+
+from src.Questionnaire.QuestionnaireCreate import QuestionnaireCreateModel
 
 
 # import password as ps
@@ -74,9 +77,11 @@ async def login(user: UserModel):
     # find the user in the db
     db = Prisma()
     db.connect()
-    import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
 
     db_user = db.user.find_unique(where={"email": user.email})
+    if (db_user is None):
+        return HTTPException(status_code=403, detail="Invalid credentials")
     db.disconnect()
     db_user = db_user.model_dump()
     # compare the password with the hashed password
@@ -109,7 +114,7 @@ async def logout(token: TokenModel):
 async def token_auth(request: Request):
     # Check if the token is present in the headers
     token = request.headers.get("Authorization")
-
+    # import pdb; pdb.set_trace()
     # If the token is not present, raise an HTTPException
     if not token:
         raise HTTPException(status_code=401, detail="Token is missing")
@@ -117,11 +122,53 @@ async def token_auth(request: Request):
     # If the token is present, check if valid
     # if not valid, raise an HTTPException
     db = Prisma()
-    await db.connect()
-    db_token = await db.token.find_unique(where={"token": token})
+    db.connect()
+    db_token = db.token.find_unique(where={"token": token})
     
-    await db.disconnect()
+    db.disconnect()
     if not db_token:
         raise HTTPException(status_code=401, detail="Token is invalid")
+
+    # check the the token is not expired by 24 hours
+    timestamp = db_token.createdAt
+
+    # # Parse the timestamp string to a datetime object
+    # timestamp = datetime.fromisoformat(timestamp_str)
+
+    # Get the current time
+    current_time = datetime.now(timezone.utc)
+
+    # Calculate the time difference
+    time_difference = current_time - timestamp
+
+    if (time_difference > timedelta(hours=24)):
+        raise HTTPException(status_code=401, detail="Token is expired")
+    return db_token
     
 
+
+@router.get("/user")
+async def get_current_user(token: TokenModel = Depends(token_auth)):
+    # If the token is valid, return the user
+    
+    db = Prisma()
+    db.connect()
+    # import pdb; pdb.set_trace()
+    db_user = db.token.find_unique(where={"user_email": token.user_email})
+    db.disconnect()
+    db_user = db_user.model_dump()
+    return db_user
+    # return token
+
+
+@router.post('/create')
+async def create_user(data: QuestionnaireCreateModel, token: TokenModel = Depends(token_auth)):
+    try: 
+        db = Prisma()
+        db.connect()
+        questionnaire = db.questionnaire.create(data={"title": data.title, "user_email": token.user_email})
+
+        db.disconnect()
+        return questionnaire
+    except Exception as e:
+        return HTTPException(status_code=400, detail="Invalid data F - U")

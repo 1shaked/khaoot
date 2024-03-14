@@ -3,6 +3,8 @@ from typing import Union
 from fastapi import FastAPI
 from prisma import Prisma
 from src.Auth import auth
+
+from src.Questionnaire import Questionnaire
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -16,6 +18,7 @@ origins = [
 
 
 app.include_router(auth.router, prefix="/auth")
+app.include_router(Questionnaire.router, prefix="/questionnaire")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
