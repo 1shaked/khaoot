@@ -83,9 +83,9 @@ async def login(user: UserModel):
     if (db_user is None):
         return HTTPException(status_code=403, detail="Invalid credentials")
     db.disconnect()
-    db_user = db_user.model_dump()
+    # db_user = db_user.model_dump()
     # compare the password with the hashed password
-    is_login = verify_password(db_user['password'], bytes.fromhex(db_user['salt']), user.password)
+    is_login = verify_password(db_user.password, bytes.fromhex(db_user.salt), user.password)
     # if login create a new token
     if (is_login): 
         db.connect()

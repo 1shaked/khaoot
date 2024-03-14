@@ -52,5 +52,5 @@ def get_question(id: int, ):
     questionnaire = db.questionnaire.find_unique(where={'id': id})
     # import pdb; pdb.set_trace()
     db.disconnect()
-    return {'questions': questions, 'tornoments': tornoments, 'title': questionnaire.title,}
+    return {'questions': questions, 'tornoments': tornoments, 'title': questionnaire.title, 'id' : id}
 

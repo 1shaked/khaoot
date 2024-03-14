@@ -1,6 +1,10 @@
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { toast } from "@/components/ui/use-toast"
 import { customFetch } from "@/utils/HttpClient"
-import { useQuery } from "@tanstack/react-query"
+import { Label } from "@radix-ui/react-label"
+import { useMutation, useQuery } from "@tanstack/react-query"
+import { useState } from "react"
+import { useForm } from "react-hook-form"
 // import { useEffect } from "react"
 import { Link, useParams } from "react-router-dom"
 
@@ -36,6 +40,7 @@ export const TornomentsItemSchemaZod = z.object({
 
 export const QuestionnaireDetailsSchemaZod = z.object({
     title: z.string(),
+    id: z.number(),
     questions: z.array(QuestionSchemaItemZod),
     tornoments: z.array(TornomentsItemSchemaZod),
 })
@@ -60,7 +65,7 @@ export function QuestionnaireDetails() {
         },
     })
 
-    if (id === undefined) return <div>url is broken </div>
+    if (id === undefined || get_details_query.data === undefined) return <div>url is broken </div>
     return <main>
         {/* title */}
         <div className="text-2xl">
@@ -76,6 +81,9 @@ export function QuestionnaireDetails() {
             key={question.id}>
                 {question.title}
             </div>)}
+            <AddQuestion questionnaire_id={get_details_query.data?.id ?? 1} refetch={() => {
+                get_details_query.refetch()
+            }}/>
         </div>
         
         <div className="">
@@ -94,4 +102,107 @@ export function QuestionnaireDetails() {
             {JSON.stringify(get_details_query.data, null , 2)}
         </pre> */}
     </main>
+}
+
+interface AddQuestionFormInterface {
+    title: string;
+    points: number;
+    question_time: number;
+
+}
+
+interface AddQuestionProps {
+    questionnaire_id: number;
+    refetch: () => void;
+}
+export function AddQuestion(props: AddQuestionProps) {
+    const [open, setOpen] = useState(false)
+    const add_question_form = useForm<AddQuestionFormInterface>()
+    const create_question_mutation = useMutation({
+        mutationKey: ['create_question_mutation'],
+        mutationFn: async (data: AddQuestionFormInterface) => {
+            const response = await customFetch(`question/create`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    ...data,
+                    Questionnaire_id: props.questionnaire_id
+                })
+            })
+            return response
+
+        },
+        onSuccess: () => {
+            props.refetch()
+            toast({
+                title: 'Question created successfully',            
+            })
+            setOpen(false)
+        }
+    })
+    return <form onSubmit={add_question_form.handleSubmit(data => {
+        create_question_mutation.mutate(data)
+    })}>
+    <div>
+        <button 
+        type="button" 
+        onClick={() => setOpen(true)}
+        className="bg-blue-500 text-white p-2 rounded-md">
+            add Question
+        </button>
+    </div>
+    <Dialog open={open} >
+    
+    <DialogContent className="sm:max-w-[425px]">
+      <DialogHeader>
+        <DialogTitle>Add question to questionnaire </DialogTitle>
+      </DialogHeader>
+      <div className="grid gap-4 py-4">
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="title" className="text-right">
+            title
+          </Label>
+          <input type="text" 
+          {...add_question_form.register('title')}
+          className="border border-blue-500 w-32 h-8"
+          placeholder="title"/>
+          {/* <Input id="name" value="Pedro Duarte" className="col-span-3" /> */}
+        </div>
+        <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="points" className="text-right">
+            points per question
+            </Label>
+            <input type="number" {...add_question_form.register('points')}
+            className="border border-blue-500 w-32 h-8"
+            placeholder="points per question" />
+        </div>
+        <div className="grid grid-cols-4 items-center gap-4">
+            
+            <Label htmlFor="question_time" className="text-right">
+                question time
+            </Label>
+            <input type="number" {...add_question_form.register('question_time')}
+            className="border border-blue-500 w-32 h-8"
+            placeholder="10 will be 10s" />
+        </div>
+      </div>
+      <DialogFooter>
+        <button
+        type="button"
+        onClick={() => {
+            setOpen(false)
+        }}>
+            Cancel
+        </button>
+        <button
+        type="submit"
+        className="bg-blue-500 text-white p-2 rounded-md text-xl"
+        onClick={() => {
+            create_question_mutation.mutate(add_question_form.getValues())
+        }}>
+            Create
+        </button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+    </form>
 }
