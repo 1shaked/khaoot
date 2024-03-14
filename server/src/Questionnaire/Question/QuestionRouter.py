@@ -4,20 +4,20 @@ from fastapi import APIRouter, Depends, HTTPException
 from prisma import Prisma
 
 from src.Auth.auth import TokenModel, token_auth
-from src.Questionnaire.Question.Question import QuestionsCreateListModal
+from src.Questionnaire.Question.Question import QuestionCreateModel, QuestionsCreateListModal
 
 
 router = APIRouter()
 
 
 @router.post('/create')
-def create_question(questions: QuestionsCreateListModal, token: TokenModel = Depends(token_auth)):
+def create_questions(question: QuestionCreateModel, ):
     try: 
         db = Prisma()
         # import pdb; pdb.set_trace()
 
         db.connect()
-        question = db.question.create_many(data=questions.questions)
+        question = db.question.create(data=question.model_dump())
         db.disconnect()
         return question
     except Exception as e:

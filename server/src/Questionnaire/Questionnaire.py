@@ -42,11 +42,15 @@ async def create_questionnaire(data: QuestionnaireCreateModel, token: TokenModel
         print(e)
         return HTTPException(status_code=400, detail="details as not valid")
     
-
+# token: TokenModel = Depends(token_auth)
 @router.get('/{id}')
-def get_question(id: int, token: TokenModel = Depends(token_auth)):
+def get_question(id: int, ):
     db = Prisma()
     db.connect()
-    question = db.questionnaire.find_unique(where={"id": id})
+    questions = db.question.find_many( where={'Questionnaire_id': id}   )
+    tornoments  = db.tornoment.find_many(where={ 'Questionnaire_id' : id} )
+    questionnaire = db.questionnaire.find_unique(where={'id': id})
+    # import pdb; pdb.set_trace()
     db.disconnect()
-    return question
+    return {'questions': questions, 'tornoments': tornoments, 'title': questionnaire.title,}
+
