@@ -7,6 +7,7 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { useAtom } from "jotai"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
+import { Link } from "react-router-dom"
 import { z } from 'zod'
 
 
@@ -72,11 +73,11 @@ export function HomePage() {
             Hello - {user_global?.user_email}
         </div>
         {/* list of qu */}
-        {questionnaire_list.data?.map((q_item ) => <div 
-        className="border p-2 m-2 rounded-md cursor-pointer hover:bg-gray-100"
+        {questionnaire_list.data?.map((q_item ) => <Link to={`/questionnaire/${q_item.id}`} 
+        className="border p-2 m-2 rounded-md cursor-pointer hover:bg-gray-100 block"
         key={q_item.id}>
             {q_item.title}
-        </div>)}
+        </Link>)}
         {/* <pre>
             {JSON.stringify(questionnaire_list.data, null, 2)}
         </pre> */}

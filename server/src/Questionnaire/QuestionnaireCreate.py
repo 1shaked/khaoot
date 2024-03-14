@@ -12,6 +12,9 @@ class QuestionnaireCreateModel(BaseModel):
     title: str
 
 
-class QuestionnaireDeleteModel(QuestionnaireCreateModel):
+class QuestionnaireDeleteModel(BaseModel):
     id: int
 
+
+class QuestionnaireGetModel(BaseModel):
+    id: int

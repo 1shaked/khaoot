@@ -15,7 +15,11 @@ class QuestionCreateModel(BaseModel):
     title: str
     points: int | None
     question_time: int | None
-    Questionnaire_id: int
+    Questionnaire_id: int 
 
 class QuestionDeleteModel(QuestionCreateModel):
     id: int
+
+
+class QuestionsCreateListModal(BaseModel):
+    questions: list[QuestionCreateModel]

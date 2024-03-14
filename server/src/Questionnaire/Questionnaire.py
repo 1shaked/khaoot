@@ -41,3 +41,12 @@ async def create_questionnaire(data: QuestionnaireCreateModel, token: TokenModel
     except Exception as e:
         print(e)
         return HTTPException(status_code=400, detail="details as not valid")
+    
+
+@router.get('/{id}')
+def get_question(id: int, token: TokenModel = Depends(token_auth)):
+    db = Prisma()
+    db.connect()
+    question = db.questionnaire.find_unique(where={"id": id})
+    db.disconnect()
+    return question

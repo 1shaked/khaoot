@@ -5,6 +5,7 @@ import { LoginSignInPage } from './pages/login/LoginSignUpForm'
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { QuestionnaireDetails } from './pages/Questionnaire/QuestionnaireDetails'
 
 const queryClient = new QueryClient()
 
@@ -17,6 +18,7 @@ function App() {
         <Routes>
             <Route path="/" Component={HomePage}  /> {/* 👈 Renders at /app/ */}
             <Route path="/login" Component={LoginSignInPage}  /> {/* 👈 Renders at /app/ */}
+            <Route path='/questionnaire/:id' Component={QuestionnaireDetails} />
         </Routes>
       </BrowserRouter>
       <Toaster />
