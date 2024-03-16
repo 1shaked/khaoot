@@ -46,7 +46,7 @@ def create_questions(id: int, questions: QuestionCreateAnswersModel, ):
 
 @router.get('/answers/{id}/list/')
 def get_questions(id: int):
-    import pdb; pdb.set_trace()
+    # import pdb; pdb.set_trace()
     db = Prisma()
     db.connect()
     answers = db.answer.find_many(where={"question_id": id})

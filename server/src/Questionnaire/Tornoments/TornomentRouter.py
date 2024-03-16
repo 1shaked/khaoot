@@ -48,3 +48,16 @@ def create_tornoment(data: TornomentCreateModel, ):
         return HTTPException(status_code=400, detail="details as not valid")
     
 
+
+@router.get('/get_guests/')
+def get_guests():
+    db = Prisma()
+    db.connect()
+    guests = db.user.find_many()
+    db.disconnect()
+    emails = []
+
+    for guest in guests:
+        emails.append(guest.email)
+    return emails
+    # return guests

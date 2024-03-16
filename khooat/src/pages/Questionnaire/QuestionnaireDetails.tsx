@@ -105,7 +105,7 @@ export function QuestionnaireDetails() {
                 {question.time}  {question.id}
             </Link>)}
         </div>
-
+        <TornomentCreate questionnaire_id={parseInt(id)}/>
         {/* <pre>
             {JSON.stringify(get_details_query.data, null , 2)}
         </pre> */}
@@ -385,4 +385,111 @@ export function AddAnswersToQuestion(props: AddAnswersToQuestionProps) {
             </DialogContent>
         </Dialog>
     </form>
+}
+
+interface TornomentCreateForm {
+    guest_list: {
+        email: string;
+    }[];
+    // start_time: string;
+}
+
+interface TornomentCreatePropsI {
+    questionnaire_id: number;
+}
+export function TornomentCreate(props: TornomentCreatePropsI) {
+    const tornoment_create_form = useForm<TornomentCreateForm>();
+    const guest_list_field_array = useFieldArray({
+        control: tornoment_create_form.control,
+        name: 'guest_list',
+        keyName: 'guest_list_id'
+    });
+    const guest_list = useQuery({
+        queryKey: ['guest_list'],
+        queryFn: async () => {
+            const response = await customFetch('tornoment/get_guests/')
+            return response as string[]
+        }
+    })
+    const [open, setOpen] = useState(false);
+    const create_tornement_mutation = useMutation({
+        mutationFn: async (data: TornomentCreateForm) => {
+            const response = await customFetch(`tornoment/create/`, {
+                method: 'POST',
+                body: JSON.stringify({
+                    guests: data.guest_list.map((guest) => guest.email),
+                    Questionnaire_id: props.questionnaire_id
+                })
+            })
+            return response as { id : number}
+        },
+        onSuccess: (data) => {
+            setOpen(false)
+            toast({
+                title: `Tornoment created successfully with id ${data.id}, we will start in 3 minutes`,
+            })
+        }
+    })
+    return <div>    
+        <button type="button"
+        className="p-2 bg-blue-400 border-2 border-blue-500 rounded-md text-white transition hover:bg-blue-300 hover:text-black"
+        onClick={() => {
+            setOpen(true)
+        }}
+
+        >
+            Create Tornoment
+        </button>
+
+        <Dialog open={open} >
+
+            <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                    <DialogTitle>Add question to questionnaire </DialogTitle>
+                </DialogHeader>
+                <form action="" >
+            <div className="flex flex-row gap-4 flex-wrap ">
+                {guest_list.data?.map(guest => <div key={guest} >
+                    <button type="button"
+                    className={`transition-all p-4 ${guest_list_field_array.fields.findIndex(guest_item => guest_item.email === guest) !== -1 ? 'bg-red-400' : 'bg-cyan-400'}`}
+                    onClick={() => {
+                        if (guest_list_field_array.fields.findIndex(guest_item => guest_item.email === guest) !== -1) {
+                            guest_list_field_array.remove(guest_list_field_array.fields.findIndex(guest_item => guest_item.email === guest))
+                        }
+                        else {
+                            guest_list_field_array.append({email: guest})
+                        }
+                    }}
+                    >
+                    {guest}
+                    {' - '}
+                    {guest_list_field_array.fields.findIndex(guest_item => guest_item.email === guest) !== -1 ? 'REMOVE' : 'ADD'}
+                    </button>
+                    
+                </div>)}
+            </div>
+
+        </form>
+                <DialogFooter>
+                    <button
+                        type="button"
+                        onClick={() => {
+                            setOpen(false)
+                        }}>
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        className="bg-blue-500 text-white p-2 rounded-md text-xl"
+                        onClick={() => {
+                            create_tornement_mutation.mutate(tornoment_create_form.getValues())
+                            // create_question_mutation.mutate(add_question_form.getValues())
+                        }}>
+                        Create
+                    </button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+        
+    </div>
 }
