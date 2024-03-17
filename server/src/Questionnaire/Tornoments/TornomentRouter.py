@@ -23,6 +23,7 @@ model GustInTornoment {
 from fastapi import APIRouter, HTTPException
 from prisma import Prisma
 from pydantic import BaseModel
+from datetime import datetime, timedelta
 
 
 class TornomentCreateModel(BaseModel):
@@ -35,10 +36,12 @@ router = APIRouter()
 @router.post('/create')
 def create_tornoment(data: TornomentCreateModel, ):
     try: 
+        now = datetime.now()
+        minutes_3 = now + timedelta(minutes=3)
         db = Prisma()
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
         db.connect()
-        tornoment = db.tornoment.create(data={"Questionnaire_id": data.Questionnaire_id})
+        tornoment = db.tornoment.create(data={"Questionnaire_id": data.Questionnaire_id, 'start_time': minutes_3})
         for guest in data.guests:
             db.gustintornoment.create(data={"tornoment_id": tornoment.id, 'user_email': guest, })
         db.disconnect()
