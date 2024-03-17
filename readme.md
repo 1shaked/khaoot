@@ -16,3 +16,7 @@ pip install prisma
 pip install websockets
 prisma generate // sudo prisma generate if you are on linux or mac
 ```
+
+
+repo
+link: https://github.com/1shaked/khaoot
