@@ -20,7 +20,7 @@ function App() {
             <Route path="/" Component={HomePage}  /> {/* 👈 Renders at /app/ */}
             <Route path="/login" Component={LoginSignInPage}  /> {/* 👈 Renders at /app/ */}
             <Route path='/questionnaire/:id' Component={QuestionnaireDetails} />
-            <Route path='/tornoment/:id' Component={TornomentDetails} />
+            <Route path='/tornoment/:id/:q_id' Component={TornomentDetails} />
         </Routes>
       </BrowserRouter>
       <Toaster />

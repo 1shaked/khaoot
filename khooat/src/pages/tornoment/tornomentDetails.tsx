@@ -60,7 +60,7 @@ export function TornomentDetails() {
     // }, [])
     return <main>
 
-        <h1>{id}</h1>
+        <h1 className="text-xl">tor id is {id}</h1>
         <WebSocketDemo />
     </main>
 }
@@ -76,12 +76,12 @@ export const WebSocketDemo = () => {
   const [questions, setQuestions] = useAtom(QuestionsAtom)
   const user_global = useAtomValue(UserGlobalAtom)
 
-  const { id } = useParams()
+  const { id, q_id } = useParams()
 
   const answers_base_value_mutation = useMutation({
     mutationKey: ['question_answers', ],
     mutationFn: async () => {
-        const response = await customFetch(`tornoment/get_all_questions/20/${id}`, {
+        const response = await customFetch(`tornoment/get_all_questions/${q_id}/${id}`, {
             method: 'GET'
         })
         return response
