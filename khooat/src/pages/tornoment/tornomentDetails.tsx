@@ -99,7 +99,12 @@ export const WebSocketDemo = () => {
     }        
 })
   const { sendMessage, lastMessage, readyState , } = useWebSocket(socketUrl);
-
+  useEffect(() => {
+    answers_base_value_mutation.mutate()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    id, q_id
+  ])
   useEffect(() => {
     if (lastMessage !== null) {
       setMessageHistory((prev) => prev.concat(lastMessage));
