@@ -236,7 +236,7 @@ interface AddAnswersToQuestionProps {
     refetch: () => void;
     question: string;
 }
-interface AddAnswersToQuestionForm {
+export interface AddAnswersToQuestionForm {
     answers: {
         title: string;
         is_correct: boolean;

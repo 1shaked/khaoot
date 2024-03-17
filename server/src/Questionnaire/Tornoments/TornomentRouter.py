@@ -20,10 +20,12 @@ model GustInTornoment {
 }
 '''
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from prisma import Prisma
 from pydantic import BaseModel
 from datetime import datetime, timedelta
+
+from src.Auth.auth import TokenModel, token_auth
 
 
 class TornomentCreateModel(BaseModel):
@@ -64,3 +66,23 @@ def get_guests():
         emails.append(guest.email)
     return emails
     # return guests
+
+
+@router.get('/get_all_questions/{id}/{tor_id}')
+def get_all_questions(id: int, tor_id: int,  token: TokenModel = Depends(token_auth)):
+    db = Prisma()
+    db.connect()
+    questions = db.question.find_many( where={'Questionnaire_id': id}   )
+    # for each question get the answers
+    for question in questions:
+        answers = db.answer.find_many(where={'question_id': question.id})
+        question.answers = answers
+        # get all the answer for this question for this user
+        token.user_email
+        answer_for_user = db.answertoquestionintor.find_first(
+            where={'question_id': question.id, 'user_email': token.user_email, 'tornoment_id': tor_id}
+            )
+        print(answer_for_user)
+        question.answerToQuestionInTor = answer_for_user
+    db.disconnect()
+    return questions

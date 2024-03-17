@@ -28,7 +28,7 @@ model User {
   tokens Token?
   Questionnaire Questionnaire[] 
   guests     GustInTornoment[]
-
+  answerToQuestionInTor AnswerToQuestionInTor[]
 }
 
 model Token {
@@ -60,6 +60,8 @@ model Question {
   points    Int @default(50)
   question_time Int @default(10)
   answers Answer[]
+  answerToQuestionInTor AnswerToQuestionInTor[]
+
 
 }
 
@@ -69,6 +71,8 @@ model Answer {
   question_id Int
   title     String
   is_correct Boolean @default(false)
+  answerToQuestionInTor AnswerToQuestionInTor[]
+
 }
 
 
@@ -78,6 +82,7 @@ model Tornoment {
   Questionnaire_id Int
   start_time DateTime @default(now())
   tournamentsAsGuest GustInTornoment[]
+  tors AnswerToQuestionInTor[]
 }
 
 model GustInTornoment {
@@ -88,4 +93,16 @@ model GustInTornoment {
   init_time DateTime @default(now())
   start_time DateTime?
   @@id([tornoment_id, user_email])
+}
+
+model AnswerToQuestionInTor {
+  tornoment_id Int
+  question_id Int
+  user_email String
+  answer_id Int
+  tornoment Tornoment @relation(fields: [tornoment_id], references: [id])
+  user User @relation(fields: [user_email], references: [email])
+  question Question @relation(fields: [question_id], references: [id])
+  answer Answer @relation(fields: [answer_id], references: [id])
+  @@id([tornoment_id, question_id, user_email])
 }
