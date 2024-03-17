@@ -101,7 +101,7 @@ export function QuestionnaireDetails() {
             </h2>
             {get_details_query.data?.tornoments.map(question => <Link
                 className="block border-2 border-gray-300 p-2 m-2 rounded-md hover:bg-gray-200 hover:border-gray-400"
-                to={`/tornoment/${id}/`}
+                to={`/tornoment/${question.id}/`}
                 key={question.id}>
                 {question.id} { ' ' }
                 AT {moment(question.start_time).format('YYYY/MM/DD HH:mm:ss')}-
