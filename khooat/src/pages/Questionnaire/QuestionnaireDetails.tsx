@@ -3,6 +3,7 @@ import { toast } from "@/components/ui/use-toast"
 import { customFetch } from "@/utils/HttpClient"
 import { Label } from "@radix-ui/react-label"
 import { useMutation, useQuery } from "@tanstack/react-query"
+import moment from "moment"
 import { useState } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
 // import { useEffect } from "react"
@@ -35,7 +36,7 @@ export const QuestionSchemaItemZod = z.object({
 
 export const TornomentsItemSchemaZod = z.object({
     id: z.number(),
-    time: z.string().optional(),
+    start_time: z.string(),
 })
 
 export const QuestionnaireDetailsSchemaZod = z.object({
@@ -100,12 +101,16 @@ export function QuestionnaireDetails() {
             </h2>
             {get_details_query.data?.tornoments.map(question => <Link
                 className="block border-2 border-gray-300 p-2 m-2 rounded-md hover:bg-gray-200 hover:border-gray-400"
-                to={`/questionnaire/${id}/tornoment/${question.id}`}
+                to={`/tornoment/${id}/`}
                 key={question.id}>
-                {question.time}  {question.id}
+                {question.id} { ' ' }
+                AT {moment(question.start_time).format('YYYY/MM/DD HH:mm:ss')}-
+                {/* <pre>
+                    {JSON.stringify(question, null, 2)}
+                </pre> */}
             </Link>)}
         </div>
-        <TornomentCreate questionnaire_id={parseInt(id)}/>
+        <TornomentCreate questionnaire_id={parseInt(id)} refetch={get_details_query.refetch}/>
         {/* <pre>
             {JSON.stringify(get_details_query.data, null , 2)}
         </pre> */}
@@ -396,6 +401,7 @@ interface TornomentCreateForm {
 
 interface TornomentCreatePropsI {
     questionnaire_id: number;
+    refetch: () => void;    
 }
 export function TornomentCreate(props: TornomentCreatePropsI) {
     const tornoment_create_form = useForm<TornomentCreateForm>();
@@ -428,6 +434,7 @@ export function TornomentCreate(props: TornomentCreatePropsI) {
             toast({
                 title: `Tornoment created successfully with id ${data.id}, we will start in 3 minutes`,
             })
+            props.refetch()
         }
     })
     return <div>    
