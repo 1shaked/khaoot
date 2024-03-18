@@ -100,6 +100,13 @@ export const WebSocketDemo = () => {
 })
   const { sendMessage, lastMessage, readyState , } = useWebSocket(socketUrl);
   useEffect(() => {
+    sendMessage(JSON.stringify({
+      type: "JOIN",
+      user_email: user_global?.user_email ?? localStorage.getItem('user_email') ?? 'anonymous',
+      // id: parseInt(id ?? '0'),
+      // q_id: parseInt(q_id ?? '0'),
+      
+    }))
     answers_base_value_mutation.mutate()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [

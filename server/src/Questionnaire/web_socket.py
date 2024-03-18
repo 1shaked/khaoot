@@ -60,6 +60,7 @@ async def broadcast_to_room(room_name: str, message: str):
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     active_websockets.add(websocket)
+    
     try:
         while True:
             data = await websocket.receive_text()
@@ -70,7 +71,10 @@ async def websocket_endpoint(websocket: WebSocket):
             if command == "ECHO":
                 response = f"Echo: {message}"
 
-            
+            if command == 'JOIN':
+                # get the user
+                user_email = data.get('user_email')
+                clients[websocket] = user_email
             elif command == "JOIN_TOR":
                 # get the tornoment id and add the user to the tornoment
                 tor_id = data.get('id')
@@ -99,6 +103,7 @@ async def websocket_endpoint(websocket: WebSocket):
                     rooms[tor_id] = set()
                 rooms[tor_id].add(websocket)
                 # get the message and send it to the room
+                
                 await broadcast_to_room(tor_id, message)
             
 
