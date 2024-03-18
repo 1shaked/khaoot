@@ -41,7 +41,6 @@ def create_tornoment(data: TornomentCreateModel, ):
         now = datetime.now()
         minutes_3 = now + timedelta(minutes=3)
         db = Prisma()
-        # import pdb; pdb.set_trace()
         db.connect()
         tornoment = db.tornoment.create(data={"Questionnaire_id": data.Questionnaire_id, 'start_time': minutes_3})
         for guest in data.guests:

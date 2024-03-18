@@ -14,7 +14,6 @@ router = APIRouter()
 def create_questions(question: QuestionCreateModel, ):
     try: 
         db = Prisma()
-        # import pdb; pdb.set_trace()
 
         db.connect()
         question = db.question.create(data=question.model_dump())
@@ -46,7 +45,6 @@ def create_questions(id: int, questions: QuestionCreateAnswersModel, ):
 
 @router.get('/answers/{id}/list/')
 def get_questions(id: int):
-    # import pdb; pdb.set_trace()
     db = Prisma()
     db.connect()
     answers = db.answer.find_many(where={"question_id": id})

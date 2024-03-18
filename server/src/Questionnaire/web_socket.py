@@ -42,7 +42,6 @@ async def broadcast_to_room(room_name: str, message: str):
 # @ws_router.websocket("/joinGroup")
 # async def join_group(websocket: WebSocket, client_id: str, room_name: str):
 #     await websocket.accept()
-#     import pdb; pdb.set_trace()
 #     if room_name not in rooms:
 #         rooms[room_name] = []
 #     rooms[room_name].append(client_id)
@@ -82,7 +81,6 @@ async def websocket_endpoint(websocket: WebSocket):
 
 
             elif command == "SEND_ANSWER":
-                import pdb; pdb.set_trace()
                 # get the tornoment id and add the user to the tornoment
                 tor_id = data.get('id')
                 # get answer and question
@@ -129,7 +127,6 @@ async def websocket_endpoint(websocket: WebSocket):
 #     await websocket.accept()
 #     while True:
 #         data = await websocket.receive_text()
-#         # import pdb; pdb.set_trace()
 #         data = json.loads(data)
 #         command = data.get("type")
 #         message = data.get("message")

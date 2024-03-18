@@ -12,7 +12,6 @@ router = APIRouter()
 async def questionnaire_list(token: TokenModel = Depends(token_auth)):
     db = Prisma()
     db.connect()
-    # import pdb; pdb.set_trace()
     questionnaires = db.questionnaire.find_many(
         where={"user_email": token.user_email},
         include={
@@ -31,8 +30,6 @@ async def questionnaire_list(token: TokenModel = Depends(token_auth)):
 async def create_questionnaire(data: QuestionnaireCreateModel, token: TokenModel = Depends(token_auth)):
     try: 
         db = Prisma()
-        # import pdb; pdb.set_trace()
-
         db.connect()
         questionnaire = db.questionnaire.create(data={"title": data.title, "user_email": token.user_email})
 
@@ -50,7 +47,6 @@ def get_question(id: int, ):
     questions = db.question.find_many( where={'Questionnaire_id': id}   )
     tornoments  = db.tornoment.find_many(where={ 'Questionnaire_id' : id} )
     questionnaire = db.questionnaire.find_unique(where={'id': id})
-    # import pdb; pdb.set_trace()
     db.disconnect()
     return {'questions': questions, 'tornoments': tornoments, 'title': questionnaire.title, 'id' : id}
 
